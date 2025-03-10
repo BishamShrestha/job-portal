@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Job Portal - Home</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/index.css"> <!-- Updated path -->
+    <link rel="stylesheet" href="css/index.css">
 </head>
+
 <body>
     <?php include 'navbar.php'; ?>
 
@@ -18,28 +20,49 @@
         <div class="mt-4">
             <a class="btn btn-primary btn-lg mb-2" href="jobseeker_register.php" role="button">Job Seeker Register</a>
             <a class="btn btn-secondary btn-lg mb-2" href="employer_register.php" role="button">Employer Register</a>
-    
         </div>
-        
-        <!-- Job Search Option -->
-        <div class="mt-5">
-            <h2>Search for Jobs</h2>
-            <form action="job_search.php" method="get">
-                <div class="form-row justify-content-center">
-                    <div class="form-group col-md-3">
-                        <input type="text" class="form-control" id="keyword" name="keyword" placeholder="Keyword (e.g., Engineer)">
-                    </div>
-                    <div class="form-group col-md-3">
-                        <input type="text" class="form-control" id="location" name="location" placeholder="Location (e.g., New York)">
-                    </div>
-                    <div class="form-group col-md-2">
-                        <button type="submit" class="btn btn-primary">Search Jobs</button>
-                    </div>
-                </div>
-            </form>
+    </div>
+
+    <!-- Job Cards Section -->
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">Featured Jobs</h2>
+        <div class="row">
+
+            <?php
+            // Database connection
+            include 'db.php';
+
+            // Fetch jobs from the database (limit to 4 jobs for display)
+            $jobs_query = "SELECT id, job_title, company, location, salary, benefits 
+                           FROM jobs
+                           LIMIT 4";
+            $result = $conn->query($jobs_query);
+
+            if ($result->num_rows > 0) {
+                // Loop through and display each job in a card
+                while ($job = $result->fetch_assoc()) {
+                    echo '
+                        <div class="col-md-3 mb-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">' . htmlspecialchars($job['job_title']) . '</h5>
+                                    <p class="card-text"><strong>Company:</strong> ' . htmlspecialchars($job['company']) . '</p>
+                                    <p class="card-text"><strong>Location:</strong> ' . htmlspecialchars($job['location']) . '</p>
+                                    <p class="card-text"><strong>Salary:</strong> ' . htmlspecialchars($job['salary']) . '</p>
+                                </div>
+                            </div>
+                        </div>
+                    ';
+                }
+            } else {
+                echo '<p>No jobs available at the moment.</p>';
+            }
+            ?>
+
         </div>
     </div>
 
     <?php include 'footer.php'; ?>
 </body>
+
 </html>

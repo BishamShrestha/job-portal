@@ -18,8 +18,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $job_id = $_POST['job_id'];
     $applicant_name = $_SESSION['job_seeker']['name']; // Assuming job seeker's name is stored in the session
     $desired_salary = $_POST['desired_salary'];
+    $job_seeker_id = $_SESSION['job_seeker']['id']; // Assuming the job seeker ID is stored in the session
 
-    // Handle the uploaded file
+    // Handle the uploaded file (cover letter)
     if (isset($_FILES['cover_letter_pdf']) && $_FILES['cover_letter_pdf']['error'] == 0) {
         // Set the upload directory
         $upload_dir = 'uploads/';
@@ -42,11 +43,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (move_uploaded_file($_FILES['cover_letter_pdf']['tmp_name'], $target_file)) {
                 // Insert application details into the database
                 $insert_query = "
-                    INSERT INTO applications (job_id, applicant_name, cover_letter, desired_salary, status) 
-                    VALUES (?, ?, ?, ?, 'Pending')";
+                    INSERT INTO applications (job_id, applicant_name, cover_letter, desired_salary, status, job_seeker_id) 
+                    VALUES (?, ?, ?, ?, 'Pending', ?)";
                 $stmt = $conn->prepare($insert_query);
-                $stmt->bind_param('isss', $job_id, $applicant_name, $file_name, $desired_salary);
-                
+                $stmt->bind_param('isssi', $job_id, $applicant_name, $file_name, $desired_salary, $job_seeker_id);
+
                 if ($stmt->execute()) {
                     echo "<div class='alert alert-success'>Application submitted successfully!</div>";
                 } else {
@@ -62,6 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -69,6 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/apply_job.css">
 </head>
+
 <body>
     <?php include 'navbar.php'; ?>
 
@@ -81,7 +84,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <option value="">Select a job</option>
                     <?php if ($jobs_result->num_rows > 0): ?>
                         <?php while ($job = $jobs_result->fetch_assoc()): ?>
-                            <option value="<?= htmlspecialchars($job['id']); ?>"><?= htmlspecialchars($job['job_title']); ?></option>
+                            <option value="<?= htmlspecialchars($job['id']); ?>"><?= htmlspecialchars($job['job_title']); ?>
+                            </option>
                         <?php endwhile; ?>
                     <?php else: ?>
                         <option value="">No jobs available</option>
@@ -90,7 +94,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
             <div class="form-group">
                 <label for="cover_letter_pdf">Upload Cover Letter (PDF)</label>
-                <input type="file" class="form-control-file" id="cover_letter_pdf" name="cover_letter_pdf" accept="application/pdf" required>
+                <input type="file" class="form-control-file" id="cover_letter_pdf" name="cover_letter_pdf"
+                    accept="application/pdf" required>
             </div>
             <div class="form-group">
                 <label for="desired_salary">Desired Salary</label>
@@ -102,4 +107,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     <?php include 'footer.php'; ?>
 </body>
+
 </html>

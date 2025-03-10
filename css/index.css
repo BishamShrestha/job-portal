@@ -1,6 +1,11 @@
+/* index.css */
+
 body {
     font-family: Arial, sans-serif;
     background-color: #f8f9fa;
+    background-image: url('https://images.unsplash.com/uploads/141103282695035fa1380/95cdfeef?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8am9iJTIwcG9ydGFsfGVufDB8fDB8fHww');
+    background-size: cover;
+    background-position: center;
 }
 
 .container h1 {
